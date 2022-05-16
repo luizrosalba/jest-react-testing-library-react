@@ -1,6 +1,6 @@
 # jest-react-testing-library-react
 
-![RTL](https://www.udemy.com/course/react-testing-library/)
+[RTL](https://www.udemy.com/course/react-testing-library/)
 
 ## Introduction 
 
