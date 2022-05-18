@@ -123,6 +123,8 @@ EsLint : linter: Analyzes static text and marks syntax that breaks rules. Catche
 
 Prettier: formatter: address format and style ;
 
+## Form Review and Popover 
+
 - styles can determinate how the tests are written. Hidden stills on code.
 
 - user-event can simulate user events. In general its recommended to use user-event than fire event. 
@@ -156,9 +158,22 @@ QueryType: (what you are searching by)
 - Text(display elem)
 - Form elements (placeholderText, labelText, DysplayValue)
 
+async example : a popup desapears after the tests finishes, so the test fails. We should await for ElementTo be removed before test 
 
+https://testing-library.com/docs/guide-disappearance
 
-## Form Review and Popover 
+```ts
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+} from '@testing-library/react';
+  // popover disappears when we mouse out
+  userEvent.unhover(termsAndConditions);
+  await waitForElementToBeRemoved(() =>
+    screen.queryByText(/no ice cream will actually be delivered/i)
+  );
+```
 
 ## Mock service worker and server response 
 
