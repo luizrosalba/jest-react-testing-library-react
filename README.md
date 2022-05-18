@@ -177,7 +177,35 @@ import {
 
 ## Mock service worker and server response 
 
-## test components wrapped in a provider 
+- Intercept network calls and return specified response 
+- we will not make network calls on tests 
+- install npm install msw (mock service worker)
+- create handlers 
+
+lecture-code\sundaes-on-demand\03-scoop-option-images\mocks\handlers.js
+
+- Create test server 
+
+sundae-server\server.js
+
+- make sure test server listens during all tests 
+
+lecture-code\sundaes-on-demand\03-scoop-option-images\setupTests.js
+
+- reset handlers after each test 
+
+- with mock server worker, the network calls done in the component are intercepted and handler response is sent back 
+
+- when waiting for something to appear async on page must use await and findBy
+
+- wait for -> another function to await with conditions 
+
+finished-projects\sundaes-on-demand\src\pages\entry\tests\OrderEntry.test.jsx
+
+
+tip: test.only and test.skip 
+
+
 
 
 
