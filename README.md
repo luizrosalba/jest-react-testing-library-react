@@ -287,7 +287,12 @@ export function OrderDetailsProvider(props) {
 
 code-quiz\sundaes-on-demand\03-toppings-subtotal\test-utils\testing-library-utils.jsx
 
-```
+
+### Custom render 
+
+We can override the render from react with our own that is wrapped in provider. If we want the context wrapped import from helper if not import from react testing lib 
+
+```ts
 import { render } from '@testing-library/react';
 import { OrderDetailsProvider } from '../contexts/OrderDetails';
 
@@ -317,3 +322,69 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 ```
+
+### Error : Component is being async updated after test is finished
+
+```
+In the next lecture, I mention that you should ignore a particular error that will occur during the code quiz, specifically: 
+
+Warning: Can't perform a React state update on an unmounted component. 
+However, in some circumstances, you may get an error starting with this string instead: 
+
+Warning: An update to Options inside a test was not wrapped in act(...)
+Or even this error:
+
+Cannot log after tests are done. Did you forget to wait for something async in your test?
+    Attempted to log "Warning: An update to Options inside a test was not wrapped in act(...).
+All three of these errors have the same cause. So whichever one you get, please ignore it, and the lecture that covers the code quiz solution will address the cause.
+```
+Options : 
+
+1) Skip auto cleanup (not possible on a test-by-test basis)
+2) mock useEffect to bypass server call (not recommended, farther from production code path)
+3) Include the beginning of a test that asserts on state changes. (Add awaits to the end of the test to avoid errors)
+
+Happy path (Happy day or golden path): Tests that costumer flow without error 
+
+## Debugging Tips 
+
+- screen.debug() => print dom 
+
+- getBy fails when there are server calls or async actions (use findBy)
+
+|Error | Possible cause| 
+
+| Error   |Cause  |
+|---|---|
+|Unable to find role"role"   | Role not exist or no element with that role matches name option  |
+| An update to component insident a test was not wrapped in act   | There was an update to component after test completed, Use await findBy    |
+| cant perform a react state update on an unmounted component  | There was an update to component after test completed, Use await findBy  |
+
+### Jest Mock Functions 
+
+- jest.fn()
+- Does not do anythin 
+- placeholder to avoid errors 
+Example : 
+```TS
+<Scoop
+name="vanilla",
+updateItem={jest.fn()}
+/>
+```
+
+https://kentcdodds.com/blog/common-mistakes-with-react-testing-library
+
+https://github.com/luizrosalba/kentcdodds.com/tree/main/content/blog
+
+### Questions in a test
+
+1) What to render (render the smallest component)
+2) Do we need to pass props ? 
+3) Do we need tp wrap a provider ?
+4) What behavior need test
+5) What queries and events ? 
+6) Async ? use await 
+
+https://testing-library.com/docs/react-testing-library/cheatsheet/
+
