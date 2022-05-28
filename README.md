@@ -205,7 +205,115 @@ finished-projects\sundaes-on-demand\src\pages\entry\tests\OrderEntry.test.jsx
 
 tip: test.only and test.skip 
 
+## Find element by a partirl text 
+const scoopsSubtotal = screen.getByText('Scoops total: $', { exact: false });
 
 
+## Testing Context
+
+1) create context with createContext. This is where you create the states and functions to update the state  
+2) make a custom hook with useContext 
+3) the context can be memoized 
+4) return a JSX which will wrap the children inside the provider  
+5) Apply the provider to app.js or where its needed
+6) Use the hook to update the state inside the context
+
+code-quiz\sundaes-on-demand\03-toppings-subtotal\App.js
+
+```TS
+// create custom hook to check whether we're inside a provider
+export function useOrderDetails() {
+  const context = useContext(OrderDetails);
+  ///happens when used outside a provider context will be undefined
+  if (!context) {
+    throw new Error(
+      'useOrderDetails must be used within an OrderDetailsProvider'
+    );
+  }
+
+  return context;
+}
+```
+- make context provider with internal state via useState 
+- export custom hook and provider (ln 76)
+```ts
+export function OrderDetailsProvider(props) {
+  const [optionCounts, setOptionCounts] = useState({
+    scoops: new Map(),
+    toppings: new Map(),
+  });
+  const zeroCurrency = formatCurrency(0);
+  const [totals, setTotals] = useState({
+    scoops: zeroCurrency,
+    toppings: zeroCurrency,
+    grandTotal: zeroCurrency,
+  });
+
+  useEffect(() => {
+    const scoopsSubtotal = calculateSubtotal('scoops', optionCounts);
+    const toppingsSubtotal = calculateSubtotal('toppings', optionCounts);
+    const grandTotal = scoopsSubtotal + toppingsSubtotal;
+    setTotals({
+      scoops: formatCurrency(scoopsSubtotal),
+      toppings: formatCurrency(toppingsSubtotal),
+      grandTotal: formatCurrency(grandTotal),
+    });
+  }, [optionCounts]);
+  // keep the value from being recalculated unnecessarly
+  const value = useMemo(() => {
+    function updateItemCount(itemName, newItemCount, optionType) {
+      const newOptionCounts = { ...optionCounts }; /// copy for immutability
+
+      // update option count for this item with the new value
+      const optionCountsMap = optionCounts[optionType];
+      optionCountsMap.set(itemName, parseInt(newItemCount));
+
+      setOptionCounts(newOptionCounts);
+    }
+
+    // getter: object containing option counts for scoops and toppings, 
+    // subtotals and totals
+    // setter: updateOptionCount
+    return [{ ...optionCounts, totals }, updateItemCount];
+  }, [optionCounts, totals]);
+  return <OrderDetails.Provider value={value} {...props} />;
+}
+
+```
+
+## Testing a context and hook 
+
+- the component must have to be wrapped by the context 
+
+code-quiz\sundaes-on-demand\03-toppings-subtotal\test-utils\testing-library-utils.jsx
+
+```
+import { render } from '@testing-library/react';
+import { OrderDetailsProvider } from '../contexts/OrderDetails';
+
+const renderWithContext = (ui, options) =>
+  render(ui, { wrapper: OrderDetailsProvider, ...options });
+
+// re-export everything
+export * from '@testing-library/react';
+
+// override render method
+export { renderWithContext as render };
+
+```
+
+OBS: To run just one test in watch mode type p and type the pattern of the name of the file you want to test 
 
 
+tip : JS number format for currency 
+
+```Ts
+// format number as currency
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+```
